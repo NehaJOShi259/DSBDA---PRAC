@@ -1,0 +1,81 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load iris dataset
+df = sns.load_dataset("iris")
+
+# -----------------------------------
+# 1. Feature names and types
+# -----------------------------------
+print("FEATURES AND TYPES:\n")
+print(df.dtypes)
+
+print("\nInference:")
+print("""
+- sepal_length → Numeric (continuous)
+- sepal_width  → Numeric (continuous)
+- petal_length → Numeric (continuous)
+- petal_width  → Numeric (continuous)
+- species      → Nominal (categorical)
+""")
+
+# -----------------------------------
+# 2. Histograms (Feature distributions)
+# -----------------------------------
+df.hist(figsize=(10, 8), bins=15)
+plt.suptitle("Iris Dataset - Feature Distributions (Histograms)")
+plt.show()
+
+# -----------------------------------
+# 3. Boxplots (Outlier detection)
+# -----------------------------------
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df)
+plt.title("Iris Dataset - Boxplots")
+plt.xticks(rotation=45)
+plt.show()
+
+# -----------------------------------
+# 4. Outlier detection using IQR
+# -----------------------------------
+print("\nOUTLIER DETECTION (IQR METHOD):\n")
+
+for col in df.columns[:-1]:  # exclude species
+    Q1 = df[col].quantile(0.25)
+    Q3 = df[col].quantile(0.75)
+    IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+
+    print(f"{col}: {len(outliers)} outliers")
+
+# -----------------------------------
+# 5. Distribution comparison (Inference)
+# -----------------------------------
+print("\nCOMPARISON OF DISTRIBUTIONS & INFERENCE:\n")
+
+print("""
+1. Sepal Length:
+   - Nearly normal distribution
+   - Very few outliers
+
+2. Sepal Width:
+   - Slightly skewed distribution
+   - Contains noticeable outliers
+
+3. Petal Length:
+   - Bimodal distribution (clear class separation)
+   - Almost no outliers
+
+4. Petal Width:
+   - Bimodal distribution
+   - Few mild outliers
+
+Overall Insight:
+- Petal features are more informative for classification
+- Sepal width shows highest variation and outliers
+""")
