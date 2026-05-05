@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+url = "https://raw.githubusercontent.com/selva86/datasets/master/weight-height.csv"
+df = pd.read_csv(url)
+
+
+
+**1. Missing Values & Inconsistencies**
+df.info()
+df.isnull().sum()
+
+df['Gender'] = df['Gender'].str.strip().str.capitalize()
+
+df.fillna(df.mean(numeric_only=True), inplace=True)
+
+df.describe()
+df['Gender'].value_counts()
+
+
+
+
+
+🔹 2. Outlier Detection & Treatment
+plt.figure(figsize=(10,5))
+sns.boxplot(data=df[['Height','Weight']])
+plt.show()
+
+def remove_outliers(col):
+    Q1 = df[col].quantile(0.25)
+    Q3 = df[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+    return df[(df[col] >= lower) & (df[col] <= upper)]
+
+df = remove_outliers('Height')
+df = remove_outliers('Weight')
+
+
+
+
+
+🔹 3. Data Transformation
+df['Weight_kg'] = df['Weight'] * 0.453592
+
+df['Weight_log'] = np.log(df['Weight'])
+
+plt.figure(figsize=(12,5))
+
+plt.subplot(1,2,1)
+sns.histplot(df['Weight'], kde=True)
+
+plt.subplot(1,2,2)
+sns.histplot(df['Weight_log'], kde=True)
+
+plt.show()
+
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()
+df[['Height_scaled','Weight_scaled']] = scaler.fit_transform(df[['Height','Weight']])
+
+df.head()
