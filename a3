@@ -1,0 +1,52 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+
+
+
+
+🔹 1. Logistic Regression (Good vs Bad Wine)
+url = "https://raw.githubusercontent.com/selva86/datasets/master/winequality-red.csv"
+df = pd.read_csv(url)
+
+df['quality_label'] = df['quality'].apply(lambda x: 1 if x >= 7 else 0)
+
+X = df.drop(['quality', 'quality_label'], axis=1)
+y = df['quality_label']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+
+
+
+
+🔹 2. Confusion Matrix + Metrics
+cm = confusion_matrix(y_test, y_pred)
+
+TN, FP, FN, TP = cm.ravel()
+
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+error_rate = (FP + FN) / (TP + TN + FP + FN)
+precision = TP / (TP + FP)
+recall = TP / (TP + FN)
+
+print("Confusion Matrix:")
+print(cm)
+
+print("TP:", TP)
+print("FP:", FP)
+print("TN:", TN)
+print("FN:", FN)
+
+print("Accuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
