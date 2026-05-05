@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# -----------------------------------
+# 1. LOAD DATASET
+# -----------------------------------
+df = pd.read_csv("iris.csv")
+
+print("Dataset Preview:\n", df.head())
+
+# Assume dataset columns: 
+# sepal_length, sepal_width, petal_length, petal_width, species
+
+X = df.drop("species", axis=1)
+y = df["species"]
+
+# -----------------------------------
+# 2. TRAIN-TEST SPLIT
+# -----------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# -----------------------------------
+# 3. NAIVE BAYES MODEL
+# -----------------------------------
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+# -----------------------------------
+# 4. CONFUSION MATRIX
+# -----------------------------------
+cm = confusion_matrix(y_test, y_pred)
+
+print("\nConfusion Matrix:\n", cm)
+
+# -----------------------------------
+# 5. EXTRACT TP, FP, TN, FN
+# (For multiclass, we compute per-class metrics)
+# -----------------------------------
+
+classes = np.unique(y)
+
+for i, cls in enumerate(classes):
+    TP = cm[i, i]
+    FP = cm[:, i].sum() - TP
+    FN = cm[i, :].sum() - TP
+    TN = cm.sum() - (TP + FP + FN)
+
+    print(f"\nClass: {cls}")
+    print(f"TP: {TP}, FP: {FP}, FN: {FN}, TN: {TN}")
+
+    accuracy = (TP + TN) / cm.sum()
+    error_rate = 1 - accuracy
+    precision = TP / (TP + FP) if (TP + FP) != 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) != 0 else 0
+
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Error Rate: {error_rate:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+
+# -----------------------------------
+# 6. OVERALL METRICS
+# -----------------------------------
+print("\nOverall Accuracy:", accuracy_score(y_test, y_pred))
+
+print("Overall Precision (macro):", precision_score(y_test, y_pred, average='macro'))
+print("Overall Recall (macro):", recall_score(y_test, y_pred, average='macro'))
