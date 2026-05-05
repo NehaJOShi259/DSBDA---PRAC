@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+
+
+//Logistic Regression Model (Ad Click Prediction)
+url = "https://raw.githubusercontent.com/selva86/datasets/master/advertising.csv"
+df = pd.read_csv(url)
+
+df = df.drop(['Ad Topic Line','City','Country','Timestamp'], axis=1)
+
+X = df.drop('Clicked on Ad', axis=1)
+y = df['Clicked on Ad']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+
+
+
+// Confusion Matrix + Metrics
+cm = confusion_matrix(y_test, y_pred)
+
+TN, FP, FN, TP = cm.ravel()
+
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+error_rate = (FP + FN) / (TP + TN + FP + FN)
+precision = TP / (TP + FP)
+recall = TP / (TP + FN)
+
+print("Confusion Matrix:")
+print(cm)
+
+print("TP:", TP)
+print("FP:", FP)
+print("TN:", TN)
+print("FN:", FN)
+
+print("Accuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
