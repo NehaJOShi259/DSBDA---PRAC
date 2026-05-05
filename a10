@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+url = "https://raw.githubusercontent.com/selva86/datasets/master/Social_Network_Ads.csv"
+df = pd.read_csv(url)
+
+df.head()
+🔹 1. Data Preparation
+df = df.drop(['User ID'], axis=1)
+
+df['Gender'] = pd.get_dummies(df['Gender'], drop_first=True)
+
+X = df.drop('Purchased', axis=1)
+y = df['Purchased']
+🔹 2. Train-Test Split + Scaling
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+🔹 3. Logistic Regression Model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+🔹 4. Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+
+TN, FP, FN, TP = cm.ravel()
+
+print("Confusion Matrix:")
+print(cm)
+
+print("TP:", TP)
+print("FP:", FP)
+print("TN:", TN)
+print("FN:", FN)
+🔹 5. Metrics Calculation
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+error_rate = (FP + FN) / (TP + TN + FP + FN)
+precision = TP / (TP + FP)
+recall = TP / (TP + FN)
+
+print("Accuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
