@@ -1,0 +1,54 @@
+//2
+
+import pandas as pd
+
+# Load dataset
+data = pd.read_csv("iris.csv")
+
+# Column names (adjust if needed)
+features = data.columns[:-1]
+label = data.columns[-1]
+
+# Species list
+species_list = data[label].unique()
+
+print("Basic Statistical Details for Iris Dataset\n")
+
+for species in species_list:
+    print("\n===================================")
+    print("Species:", species)
+    print("===================================")
+    
+    subset = data[data[label] == species]
+    
+    # Mean
+    print("\nMean:\n", subset[features].mean())
+    
+    # Standard Deviation
+    print("\nStandard Deviation:\n", subset[features].std())
+    
+    # Percentiles
+    print("\nPercentiles (25%, 50%, 75%):\n", subset[features].quantile([0.25, 0.5, 0.75]))
+
+
+
+//1
+
+
+import pandas as pd
+
+# Load dataset
+data = pd.read_csv("wine.csv")
+
+# Assume last column is categorical (class/quality/type)
+categorical_col = data.columns[-1]
+
+# Numeric columns
+numeric_cols = data.select_dtypes(include='number').columns
+
+# Group by categorical variable
+grouped_stats = data.groupby(categorical_col)[numeric_cols].agg(['mean', 'median', 'min', 'max', 'std'])
+
+print("Grouped Summary Statistics:\n")
+print(grouped_stats)
+
