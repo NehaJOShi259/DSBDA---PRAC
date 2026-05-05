@@ -1,0 +1,83 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.datasets import load_iris
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# -----------------------------
+# 1. LOAD IRIS DATASET
+# -----------------------------
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+df = pd.DataFrame(X, columns=iris.feature_names)
+df["target"] = y
+
+print("\nFirst 5 rows of dataset:")
+print(df.head())
+
+
+# -----------------------------
+# 2. SPLIT DATASET
+# -----------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+
+# -----------------------------
+# 3. NAIVE BAYES MODEL
+# -----------------------------
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+
+# -----------------------------
+# 4. CONFUSION MATRIX
+# -----------------------------
+cm = confusion_matrix(y_test, y_pred)
+
+print("\nConfusion Matrix:")
+print(cm)
+
+
+# -----------------------------
+# 5. TP, FP, TN, FN (for Class 0)
+# -----------------------------
+TP = cm[0][0]
+FP = cm[1][0] + cm[2][0]
+FN = cm[0][1] + cm[0][2]
+TN = cm[1][1] + cm[1][2] + cm[2][1] + cm[2][2]
+
+print("\n--- Class 0 Metrics ---")
+print("TP:", TP)
+print("FP:", FP)
+print("FN:", FN)
+print("TN:", TN)
+
+
+# -----------------------------
+# 6. ACCURACY
+# -----------------------------
+accuracy = accuracy_score(y_test, y_pred)
+print("\nAccuracy:", accuracy)
+
+
+# -----------------------------
+# 7. ERROR RATE
+# -----------------------------
+error_rate = 1 - accuracy
+print("Error Rate:", error_rate)
+
+
+# -----------------------------
+# 8. PRECISION & RECALL
+# -----------------------------
+precision = precision_score(y_test, y_pred, average="macro")
+recall = recall_score(y_test, y_pred, average="macro")
+
+print("Precision:", precision)
+print("Recall:", recall)
