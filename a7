@@ -1,0 +1,24 @@
+import pandas as pd
+import numpy as np
+
+url = "https://raw.githubusercontent.com/selva86/datasets/master/laptops.csv"
+df = pd.read_csv(url)
+🔹 1. Missing Data Handling (Replace with Mean)
+df.isnull().sum()
+
+df.fillna(df.mean(numeric_only=True), inplace=True)
+🔹 2. Convert "Weight_kg" and "Screen_Size_cm" to Numeric
+df['Weight_kg'] = df['Weight_kg'].astype(str).str.replace('kg','').astype(float)
+df['Screen_Size_cm'] = df['Screen_Size_cm'].astype(str).str.replace('cm','').astype(float)
+🔹 3. Convert Units (kg → pounds, cm → inches)
+df['Weight_pounds'] = df['Weight_kg'] * 2.20462
+df['Screen_Size_inches'] = df['Screen_Size_cm'] * 0.393701
+🔹 4. Create Price Bins
+bins = [df['Price'].min(), df['Price'].quantile(0.33), df['Price'].quantile(0.66), df['Price'].max()]
+labels = ['Low','Medium','High']
+
+df['Price-binned'] = pd.cut(df['Price'], bins=bins, labels=labels, include_lowest=True)
+🔹 5. Convert Categorical "Screen" to Numeric
+df = pd.get_dummies(df, columns=['Screen'], drop_first=True)
+✅ Final Output
+df.head()
