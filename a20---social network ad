@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# -----------------------------------
+# 1. LOAD DATASET
+# -----------------------------------
+df = pd.read_csv("Social_Network_Ads.csv")
+
+print("Dataset Preview:\n", df.head())
+
+# -----------------------------------
+# 2. FEATURE SELECTION
+# -----------------------------------
+# Assume dataset columns:
+# User ID, Gender, Age, EstimatedSalary, Purchased
+
+X = df[["Age", "EstimatedSalary"]]
+y = df["Purchased"]
+
+# -----------------------------------
+# 3. TRAIN-TEST SPLIT
+# -----------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42
+)
+
+# -----------------------------------
+# 4. FEATURE SCALING (IMPORTANT FOR LOGISTIC REGRESSION)
+# -----------------------------------
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# -----------------------------------
+# 5. TRAIN LOGISTIC REGRESSION MODEL
+# -----------------------------------
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Prediction
+y_pred = model.predict(X_test)
+
+# -----------------------------------
+# 6. CONFUSION MATRIX
+# -----------------------------------
+cm = confusion_matrix(y_test, y_pred)
+
+print("\nConfusion Matrix:\n", cm)
+
+TN, FP, FN, TP = cm.ravel()
+
+print("\nTP:", TP)
+print("FP:", FP)
+print("TN:", TN)
+print("FN:", FN)
+
+# -----------------------------------
+# 7. PERFORMANCE METRICS
+# -----------------------------------
+
+accuracy = accuracy_score(y_test, y_pred)
+error_rate = 1 - accuracy
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+
+print("\nPerformance Metrics:")
+print(f"Accuracy   : {accuracy:.4f}")
+print(f"Error Rate : {error_rate:.4f}")
+print(f"Precision  : {precision:.4f}")
+print(f"Recall     : {recall:.4f}")
