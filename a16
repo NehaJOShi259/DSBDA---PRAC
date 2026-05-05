@@ -1,0 +1,38 @@
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Titanic dataset
+df = sns.load_dataset("titanic")
+
+# -----------------------------------
+# 1. Pattern finding using seaborn
+# -----------------------------------
+
+# Survival count by gender
+plt.figure(figsize=(6,4))
+sns.countplot(data=df, x="sex", hue="survived")
+plt.title("Survival Count by Gender")
+plt.show()
+
+# Survival count by class
+plt.figure(figsize=(6,4))
+sns.countplot(data=df, x="pclass", hue="survived")
+plt.title("Survival Count by Passenger Class")
+plt.show()
+
+# Age distribution
+plt.figure(figsize=(6,4))
+sns.histplot(df["age"].dropna(), bins=20, kde=True)
+plt.title("Age Distribution of Passengers")
+plt.show()
+
+# -----------------------------------
+# 2. Fare distribution (Histogram)
+# -----------------------------------
+
+plt.figure(figsize=(6,4))
+sns.histplot(df["fare"], bins=30, kde=True)
+plt.title("Fare Distribution of Titanic Passengers")
+plt.xlabel("Fare")
+plt.ylabel("Frequency")
+plt.show()
