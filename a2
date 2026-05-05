@@ -1,0 +1,87 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+url = "https://raw.githubusercontent.com/selva86/datasets/master/CoffeeShopRevenue.csv"
+df = pd.read_csv(url)
+
+
+
+
+
+🔹 1. Predictor Variables & Dependent Variable
+print(df.columns)
+
+X = df.drop('Daily_Revenue', axis=1)
+y = df['Daily_Revenue']
+
+print("Predictors:")
+print(X.columns)
+
+print("Dependent Variable:")
+print(y.name)
+
+
+
+
+
+
+🔹 2. Relationship Between Variables (Plots)
+for col in X.columns:
+    plt.figure()
+    sns.scatterplot(x=df[col], y=y)
+    plt.title(f"{col} vs Daily Revenue")
+    plt.show()
+
+
+
+
+
+🔹 3. Simple Linear Regression (80-20 Split)
+X_simple = df[['Number_of_Customers_Per_Day']]
+
+X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(X_simple, y, test_size=0.2, random_state=42)
+
+model_simple = LinearRegression()
+model_simple.fit(X_train_s, y_train_s)
+
+y_pred_s = model_simple.predict(X_test_s)
+
+
+
+
+
+
+🔹 4. Accuracy on Test Set
+mse_simple = mean_squared_error(y_test_s, y_pred_s)
+r2_simple = r2_score(y_test_s, y_pred_s)
+
+print("Simple Linear Regression MSE:", mse_simple)
+print("Simple Linear Regression R2:", r2_simple)
+
+
+
+
+
+
+🔹 5. Multiple Linear Regression + Comparison
+X_train_m, X_test_m, y_train_m, y_test_m = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model_multiple = LinearRegression()
+model_multiple.fit(X_train_m, y_train_m)
+
+y_pred_m = model_multiple.predict(X_test_m)
+
+mse_multiple = mean_squared_error(y_test_m, y_pred_m)
+r2_multiple = r2_score(y_test_m, y_pred_m)
+
+print("Multiple Linear Regression MSE:", mse_multiple)
+print("Multiple Linear Regression R2:", r2_multiple)
+
+print("Comparison:")
+print("Simple MSE:", mse_simple)
+print("Multiple MSE:", mse_multiple)
