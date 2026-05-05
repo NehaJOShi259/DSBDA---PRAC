@@ -1,0 +1,79 @@
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+# -------------------------------
+# 1. CREATE DATASET
+# -------------------------------
+np.random.seed(42)
+
+df = pd.DataFrame({
+    "Student_ID": range(1, 21),
+    "Name": ["Student_" + str(i) for i in range(1, 21)],
+    "Gender": ["M", "F", "M", "F", "M"] * 4,
+    "Math_Score": [78, 85, np.nan, 92, 88, 76, 101, 54, 67, 89,
+                   90, 95, 120, 70, 82, 77, np.nan, 66, 58, 85],
+    "Science_Score": [80, 83, 87, 91, 85, 79, 200, 60, 72, 88,
+                      92, 96, 84, 75, np.nan, 73, 69, 65, 58, 81],
+    "English_Score": [75, 88, 90, 85, 82, 78, 76, 300, 70, 89,
+                      93, 97, 85, 74, 80, np.nan, 68, 66, 60, 83]
+})
+
+print("Original Dataset:\n", df)
+
+# -------------------------------
+# 2. MISSING VALUE HANDLING
+# -------------------------------
+
+# Check missing values
+print("\nMissing values per column:\n", df.isnull().sum())
+
+# Fill missing numeric values with median
+for col in ["Math_Score", "Science_Score", "English_Score"]:
+    df[col].fillna(df[col].median(), inplace=True)
+
+# Check inconsistencies: scores > 100 (invalid in this dataset)
+# Replace invalid values with median
+for col in ["Math_Score", "Science_Score", "English_Score"]:
+    median_val = df[col].median()
+    df.loc[(df[col] > 100) | (df[col] < 0), col] = median_val
+
+print("\nAfter handling missing values & inconsistencies:\n", df)
+
+# -------------------------------
+# 3. OUTLIER DETECTION & TREATMENT
+# (Using Z-score method)
+# -------------------------------
+
+def handle_outliers_zscore(data, column):
+    z_scores = np.abs(stats.zscore(data[column]))
+    threshold = 3
+    outliers = np.where(z_scores > threshold)
+    
+    print(f"\nOutliers detected in {column}: {len(outliers[0])}")
+    
+    # Replace outliers with median
+    median = data[column].median()
+    data.loc[z_scores > threshold, column] = median
+
+for col in ["Math_Score", "Science_Score", "English_Score"]:
+    handle_outliers_zscore(df, col)
+
+print("\nAfter outlier treatment:\n", df)
+
+# -------------------------------
+# 4. DATA TRANSFORMATION
+# (Reduce skewness using log transformation)
+# -------------------------------
+
+df["Log_Math_Score"] = np.log1p(df["Math_Score"])  # log(1+x)
+df["Log_Science_Score"] = np.log1p(df["Science_Score"])
+
+print("\nAfter Transformation:\n", df[["Math_Score", "Log_Math_Score",
+                                        "Science_Score", "Log_Science_Score"]])
+
+# -------------------------------
+# 5. SUMMARY STATISTICS
+# -------------------------------
+
+print("\nFinal Summary:\n", df.describe())
