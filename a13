@@ -1,0 +1,159 @@
+Here is a **simple WordCount MapReduce program in Java using Hadoop**, designed to run in **local standalone mode**.
+
+---
+
+## ✅ 1. WordCount Java Code (MapReduce)
+
+```java
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+
+    // Mapper Class
+    public static class TokenizerMapper
+            extends Mapper<Object, Text, Text, IntWritable> {
+
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+
+        public void map(Object key, Text value, Context context
+        ) throws IOException, InterruptedException {
+
+            StringTokenizer itr = new StringTokenizer(value.toString());
+
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken().toLowerCase().replaceAll("[^a-z]", ""));
+                if (word.getLength() > 0) {
+                    context.write(word, one);
+                }
+            }
+        }
+    }
+
+    // Reducer Class
+    public static class IntSumReducer
+            extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+        private IntWritable result = new IntWritable();
+
+        public void reduce(Text key, Iterable<IntWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+
+    // Driver Class
+    public static void main(String[] args) throws Exception {
+
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "word count");
+
+        job.setJarByClass(WordCount.class);
+
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class);
+        job.setReducerClass(IntSumReducer.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+}
+```
+
+---
+
+## 📁 2. How to Run in Local Standalone Mode
+
+### Step 1: Create input file
+
+```bash
+mkdir input
+echo "hello world hello hadoop world" > input/file.txt
+```
+
+---
+
+### Step 2: Compile the program
+
+Make sure Hadoop is installed and classpath is set.
+
+```bash
+javac -classpath `hadoop classpath` -d . WordCount.java
+```
+
+---
+
+### Step 3: Create JAR file
+
+```bash
+jar -cvf wordcount.jar *.class
+```
+
+---
+
+### Step 4: Run Hadoop job
+
+```bash
+hadoop jar wordcount.jar WordCount input output
+```
+
+---
+
+### Step 5: View output
+
+```bash
+cat output/part-r-00000
+```
+
+---
+
+## 📊 Sample Output
+
+```
+hadoop 1
+hello 2
+world 2
+```
+
+---
+
+## 🧠 Key Concepts Used
+
+* Mapper → splits input into words
+* Reducer → aggregates word counts
+* Combiner → local optimization before reducer
+* Hadoop local mode → runs without HDFS cluster setup
+
+---
+
+If you want, I can also give:
+
+* Hadoop setup steps (single-node cluster)
+* WordCount using Python (Hadoop Streaming)
+* or Spark version of WordCount (much faster)
