@@ -1,0 +1,38 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# -----------------------------
+# LOAD DATASET (uploaded file)
+# -----------------------------
+df = pd.read_csv("gdp_dataset.csv")   # random filename assumed
+
+# -----------------------------
+# (a) BAR GRAPH: Belgium GDP (2006–2026)
+# -----------------------------
+belgium = df[df["Country"] == "Belgium"]
+
+plt.figure(figsize=(12,6))
+plt.bar(belgium["Year"], belgium["GDP"], color="skyblue")
+
+plt.title("Belgium GDP (2006–2026)")
+plt.xlabel("Year")
+plt.ylabel("GDP")
+
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+# -----------------------------
+# (b) PIE CHART: GDP (Year 2010)
+# -----------------------------
+data_2010 = df[df["Year"] == 2010]
+
+countries = data_2010["Country"]
+gdp_values = data_2010["GDP"]
+
+plt.figure(figsize=(8,8))
+plt.pie(gdp_values, labels=countries, autopct="%1.1f%%", startangle=140)
+
+plt.title("GDP Distribution (2010)")
+plt.show()
