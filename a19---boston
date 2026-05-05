@@ -1,0 +1,72 @@
+import pandas as pd
+import numpy as np
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# -----------------------------------
+# 1. LOAD BOSTON HOUSING DATASET
+# -----------------------------------
+boston = fetch_openml(name="boston", version=1, as_frame=True)
+df = boston.frame
+
+print("Dataset Preview:\n", df.head())
+
+# Target variable: MEDV (House Price)
+# Features: all other columns
+
+X = df.drop("MEDV", axis=1)
+y = df["MEDV"]
+
+# -----------------------------------
+# 2. SIMPLE LINEAR REGRESSION
+# (Using one feature: LSTAT - % lower status population)
+# -----------------------------------
+
+X_simple = df[["LSTAT"]]
+
+X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(
+    X_simple, y, test_size=0.2, random_state=42
+)
+
+simple_model = LinearRegression()
+simple_model.fit(X_train_s, y_train_s)
+
+y_pred_simple = simple_model.predict(X_test_s)
+
+mse_simple = mean_squared_error(y_test_s, y_pred_simple)
+
+# -----------------------------------
+# 3. MULTIPLE LINEAR REGRESSION
+# -----------------------------------
+
+X_train_m, X_test_m, y_train_m, y_test_m = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+multi_model = LinearRegression()
+multi_model.fit(X_train_m, y_train_m)
+
+y_pred_multi = multi_model.predict(X_test_m)
+
+mse_multi = mean_squared_error(y_test_m, y_pred_multi)
+
+# -----------------------------------
+# 4. RESULTS
+# -----------------------------------
+
+print("\n==============================")
+print("MODEL PERFORMANCE COMPARISON")
+print("==============================")
+
+print(f"\nSimple Linear Regression MSE  : {mse_simple:.4f}")
+print(f"Multiple Linear Regression MSE : {mse_multi:.4f}")
+
+# -----------------------------------
+# 5. CONCLUSION
+# -----------------------------------
+if mse_multi < mse_simple:
+    print("\n✔ Multiple Linear Regression performs better (lower MSE).")
+else:
+    print("\n✔ Simple Linear Regression performs better (rare case).")
