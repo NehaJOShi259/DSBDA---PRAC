@@ -1,0 +1,74 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# -----------------------------
+# LOAD DATASET
+# -----------------------------
+df = pd.read_csv("death_rate_dataset.csv")  # uploaded file name
+
+print(df.head())
+
+
+# =========================================================
+# (a) VISUALIZE DATA USING DIFFERENT GRAPHS
+# =========================================================
+
+# 1. Line chart - Deaths over years
+yearly_deaths = df.groupby("Year")["Deaths"].sum()
+
+plt.figure(figsize=(10,5))
+plt.plot(yearly_deaths.index, yearly_deaths.values, marker="o")
+plt.title("Total Deaths Over Years")
+plt.xlabel("Year")
+plt.ylabel("Deaths")
+plt.grid()
+plt.show()
+
+
+# 2. Bar chart - Accidents per year
+yearly_accidents = df.groupby("Year")["Accidents"].sum()
+
+plt.figure(figsize=(10,5))
+plt.bar(yearly_accidents.index, yearly_accidents.values)
+plt.title("Total Accidents Per Year")
+plt.xlabel("Year")
+plt.ylabel("Accidents")
+plt.xticks(rotation=45)
+plt.show()
+
+
+# 3. Heatmap - State vs Year (Deaths)
+pivot_table = df.pivot_table(values="Deaths", index="State", columns="Year", aggfunc="sum")
+
+plt.figure(figsize=(12,6))
+sns.heatmap(pivot_table, annot=True, cmap="Reds")
+plt.title("State-wise Deaths Heatmap")
+plt.show()
+
+
+# =========================================================
+# (b) YEAR WITH MAXIMUM ACCIDENTS
+# =========================================================
+
+max_year = yearly_accidents.idxmax()
+max_value = yearly_accidents.max()
+
+print("\nYear with maximum accidents:", max_year)
+print("Maximum accidents:", max_value)
+
+
+# =========================================================
+# (c) STATE-WISE DEATH COUNT (SUITABLE PLOT)
+# =========================================================
+
+state_deaths = df.groupby("State")["Deaths"].sum().sort_values(ascending=False)
+
+plt.figure(figsize=(10,6))
+plt.bar(state_deaths.index, state_deaths.values, color="orange")
+
+plt.title("State-wise Total Death Count")
+plt.xlabel("State")
+plt.ylabel("Deaths")
+plt.xticks(rotation=45)
+plt.show()
