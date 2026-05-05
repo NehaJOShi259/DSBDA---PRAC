@@ -1,0 +1,79 @@
+import pandas as pd
+import numpy as np
+from sklearn.datasets import load_iris
+
+# =========================================================
+# PART 1: GROUPED SUMMARY STATISTICS (Food Delivery Example)
+# =========================================================
+
+data = {
+    "Age_Group": ["18-25", "18-25", "26-35", "26-35", "36-45", "36-45", "46-60", "46-60"],
+    "Delivery_Time": [30, 35, 40, 42, 50, 48, 55, 60]
+}
+
+df = pd.DataFrame(data)
+
+print("\n==============================")
+print("PART 1: GROUPED STATISTICS")
+print("==============================")
+
+print("\nDataset:")
+print(df)
+
+# Group by categorical variable
+grouped = df.groupby("Age_Group")["Delivery_Time"]
+
+# Summary statistics
+summary = grouped.agg(["mean", "median", "min", "max", "std"])
+
+print("\nSummary Statistics (Grouped):")
+print(summary)
+
+# List of numeric values per category
+print("\nValues list per category:")
+print(grouped.apply(list))
+
+
+# =========================================================
+# PART 2: IRIS DATASET STATISTICS
+# =========================================================
+
+iris = load_iris()
+df_iris = pd.DataFrame(iris.data, columns=iris.feature_names)
+
+df_iris["species"] = iris.target
+
+# Map species names
+df_iris["species"] = df_iris["species"].map({
+    0: "Iris-setosa",
+    1: "Iris-versicolor",
+    2: "Iris-virginica"
+})
+
+print("\n==============================")
+print("PART 2: IRIS STATISTICS")
+print("==============================")
+
+print("\nIris Dataset Sample:")
+print(df_iris.head())
+
+
+# Function to calculate statistics
+def compute_stats(species_name):
+    data = df_iris[df_iris["species"] == species_name]["sepal length (cm)"]
+    
+    print(f"\n--- {species_name} ---")
+    print("Mean:", data.mean())
+    print("Median:", data.median())
+    print("Std Dev:", data.std())
+    print("Min:", data.min())
+    print("Max:", data.max())
+    print("25th Percentile:", np.percentile(data, 25))
+    print("50th Percentile:", np.percentile(data, 50))
+    print("75th Percentile:", np.percentile(data, 75))
+
+
+# Run for all species
+compute_stats("Iris-setosa")
+compute_stats("Iris-versicolor")
+compute_stats("Iris-virginica")
